@@ -5,7 +5,7 @@ module.exports = {
   'header_color': `#2a3f54`,
   'header_padding': `15px`,
   // 左侧菜单样式变量
-  'menu_background': `#4d6987`,
+  'menu_background': `#003366`,
   'menu_color': `#fff`,
   'menu_active_color': `#ffd04b`,
   // 主视图区样式变量

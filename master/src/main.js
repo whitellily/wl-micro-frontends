@@ -2,30 +2,36 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import { getAppConfigApi } from "@/api/appConfig"
+import { getAppConfigApi } from "@/api/appConfig";
 import { Message } from "element-ui";
 // 开发环境导入api mock数据
-import { mockXHR } from '../mock'
-// if(process.env.NODE_ENV == 'development'){
+import { mockXHR } from "../mock";
+// if(process.env.NODE_ENV == "development"){
 mockXHR();
 // }
 Vue.config.productionTip = false;
 
 // 导入乾坤函数
 import {
-    registerMicroApps, // 注册子应用方法
-    setDefaultMountApp, // 设默认启用的子应用
-    runAfterFirstMounted, // 有个子应用加载完毕回调
-    start, // 启动qiankun
-    addGlobalUncaughtErrorHandler, // 添加全局未捕获异常处理器
-    // initGlobalState, // 官方应用间通信
+  registerMicroApps, // 注册子应用方法
+  setDefaultMountApp, // 设默认启用的子应用
+  runAfterFirstMounted, // 有个子应用加载完毕回调
+  start, // 启动qiankun
+  addGlobalUncaughtErrorHandler // 添加全局未捕获异常处理器
+  // initGlobalState, // 官方应用间通信
 } from "qiankun";
+
+import "core-js";
+import "./util/polyfill";
+
+// import "babel-polyfill";
+
 // 按需导入element-ui
 import "./plugins/element.js";
 // 导入封装后的ui组件
 import "./library/ui/install";
 // 导入路由监听函数
-import { genActiveRule } from "./util";
+// import { genActiveRule } from "./util";
 /**
  * 主应用公共资源下发子应用
  */
@@ -53,9 +59,9 @@ let msg = {
 
 // 在主应用注册呼机
 pager.subscribe(v => {
-    console.log(`监听到子应用${v.from}发来消息：`, v)
-    store.dispatch('app/setToken', v.token)
-});
+  console.log(`监听到子应用${v.from}发来消息：`, v)
+  store.dispatch("app/setToken", v.token)
+})
 
 /* // 在主应用注册官方通信方案
 const actions = initGlobalState(msg.state);
@@ -64,62 +70,71 @@ actions.onGlobalStateChange((state, prev) => console.log(`主应用应用监听�
 
 // 主应用渲染函数
 let app = null;
-
 function render({ appContent, loading } = {}) {
-    if (!app) {
-        app = new Vue({
-            el: "#container",
-            router,
-            store,
-            data() {
-                return {
-                    content: appContent,
-                    loading
-                };
-            },
-            render(h) {
-                return h(App, {
-                    props: {
-                        content: this.content,
-                        loading: this.loading
-                    }
-                });
-            }
+  if (!app) {
+    app = new Vue({
+      el: "#container",
+      router,
+      store,
+      data() {
+        return {
+          content: appContent,
+          loading
+        };
+      },
+      render(h) {
+        return h(App, {
+          props: {
+            content: this.content,
+            loading: this.loading
+          }
         });
-    } else {
-        app.content = appContent;
-        app.loading = loading;
-    }
+      }
+    });
+  } else {
+    app.content = appContent;
+    app.loading = loading;
+  }
 };
 render();
 
 // 获取app注册表
 getAppConfigApi().then(({ data }) => {
     if (data.code === 200) {
+        console.log("data:")
+        console.log(data)
         let _res = data.data || [];
+        console.log("_res:")
+        console.log(data.data)
         // 处理菜单
-        store.dispatch('menu/setUserMenu', _res);
+        store.dispatch("menu/setUserMenu", _res);
         if (_res.length === 0) {
             Message({
-                type: 'error',
+                type: "error",
                 message: "没有可以注册的子应用数据"
             })
             return;
         }
         // 处理子应用注册数据
-        let isDev = process.env.NODE_ENV === 'development';
+        let isDev = process.env.NODE_ENV === "development";
+        console.log("process.env.NODE_ENV: " + process.env.NODE_ENV)
+        console.log("isDev: " + isDev)
         let apps = [];
         let defaultApp = null;
         _res.forEach(i => {
             apps.push({
                 name: i.module,
-                entry: isDev ? i.devEntry : i.depEntry,
-                render,
-                activeRule: genActiveRule(i.routerBase),
+                entry: isDev ? i.entry : i.entry,
+                //render,
+                container: "#sub-app-layout",
+                // activeRule: genActiveRule(i.routerBase),
+                activeRule: i.routerBase,
                 props: { ...msg, ROUTES: i.children, routerBase: i.routerBase }
             })
             if (i.defaultRegister) defaultApp = i.routerBase;
         });
+        console.log("--------------子应用注册数据---------------------")
+        console.log(apps)
         // 注册子应用
         registerMicroApps(apps, {
             beforeLoad: [

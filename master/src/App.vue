@@ -1,5 +1,5 @@
 <template>
-  <div id="root" class="main-container">
+  <div id="root" class="main-container" >
     <!-- 左侧菜单区 -->
     <the-menu class="main-menu-box" />
     <!-- 右侧视图 -->
