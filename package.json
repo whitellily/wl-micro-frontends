@@ -1,12 +1,30 @@
 {
-  "name": "wl-micro-frontends [wl-qiankun]",
-  "version": "0.1.0",
+  "name": "wl-qiankun",
+  "version": "2.0.2",
   "private": true,
   "scripts": {
     "init": "node config/install.js",
-    "cinit": "node config/install.js cnpm",
+    "cinit": "node config/c-install.js",
     "serve": "node config/start.js",
     "build": "node config/build.js",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint --fix"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "es6-promise": "^4.2.8",
+    "fetch-polyfill": "^0.8.2",
+    "fibers": "^4.0.2",
+    "isomorphic-fetch": "^2.2.1",
+    "qiankun": "^2.0.2",
+    "sass": "^1.3.0",
+    "webpack": "^4.42.1",
+    "whatwg-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-preset-env": "^1.7.0",
+    "webpack-dev-server": "^2.6.1"
   }
 }
